@@ -8,12 +8,12 @@ public class Main {
 
         //Getting Variables (non-terminal Symbols)
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Introdueix els simbols no terminals de la gramàtica separats per ',' ");
+        System.out.println("Type the non-terminal symbols of the grammar, separated by commas ',' ");
         String line = scanner.nextLine();
         Grammar grammar = new Grammar(parseVariables(line));
 
         for(Variable variable : grammar.getVariables()) {
-            System.out.println("Especifica les produccions del simbol " + variable.getName() + " separades per '|' ");
+            System.out.println("Specify the productions of symbol " + variable.getName() + " separated by '|' ");
             line = scanner.nextLine();
             addAllProductions(line,variable,grammar.getVariables());
 
@@ -35,17 +35,8 @@ public class Main {
         return linkedVariables;
     }
 
-//    private static LinkedList<Character> parseTerminals(String line) {
-//        String[] terminals = line.split(",");
-//        var linkedTerminals = new LinkedList<Character>();
-//        for(String terminal : terminals) {
-//            Variable dummy = new Character(terminal.trim());
-//            linkedTerminals.add(dummy);
-//        }
-//        return linkedTerminals;
-//    }
 
-    
+
     private static void addAllProductions(String line, Variable variable, LinkedList<Variable> variables) {
         String[] productions = line.split("\\|");
         for(String prod : productions) {

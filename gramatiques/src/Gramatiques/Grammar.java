@@ -6,17 +6,15 @@ import java.util.LinkedList;
 
 public class Grammar {
     private LinkedList<Variable> variables;
-    private LinkedList<Character> terminals;
     private final Variable startingSymbol;
 
     public Grammar(LinkedList<Variable> variables) {
         this.variables = variables;
-        this.terminals = new LinkedList<Character>();
         this.startingSymbol = variables.getFirst();
     }
 
-    protected void addTerminal(char c) {
-        terminals.add(c);
+    protected Variable getStartingSymbol() {
+        return startingSymbol;
     }
 
     protected LinkedList<Variable> getVariables() {
@@ -24,9 +22,12 @@ public class Grammar {
     }
 
     public void display() {
-        for(Variable variable : variables) {
-            System.out.println(variable.toString());
+        if(variables.contains(startingSymbol)) {
+            for(Variable variable : variables) {
+                System.out.println(variable.toString());
+            }
         }
+        System.out.println("Empty grammar");
     }
 
     protected void eliminateNonFecunds() {
@@ -39,7 +40,6 @@ public class Grammar {
         }
 
         //On the later iterations we get the non immediate fecunds
-        System.out.println(fecunds);
         fecunds = obtainNonImmediateFecunds(fecunds);
 
         //Deleting non fecund variables and productions
@@ -47,19 +47,24 @@ public class Grammar {
         while (iterator.hasNext()) {
             Variable variable = iterator.next();
             if (!fecunds.contains(variable)) {
-                iterator.remove(); // forma segura
+                iterator.remove(); 
             }
         }
 
-        for(Variable variable : this.variables) {
-            for(Production production : variable.getProductions()) {
+        for (Variable variable : this.variables) {
+            Iterator<Production> productionIterator = variable.getProductions().iterator();
+            while (productionIterator.hasNext()) {
+                Production production = productionIterator.next();
                 HashSet<Variable> prodVariables = production.getVariablesInProduction();
-                for(Variable prodVariable : prodVariables) {
-                    if(!fecunds.contains(prodVariable)) variable.removeProduction(production);
+                for (Variable prodVariable : prodVariables) {
+                    if (!fecunds.contains(prodVariable)) {
+                        productionIterator.remove(); // <- safe removal
+                        break;
+                    }
                 }
-
             }
         }
+
     }
 
     private HashSet<Variable> obtainNonImmediateFecunds(HashSet<Variable> fecunds) {
@@ -105,9 +110,11 @@ public class Grammar {
         int startCardinal;
         do {
             startCardinal = accessibles.size();
-            for(Variable variable : accessibles) {
-                accessibles.addAll(variable.accessibleVariables());
+            HashSet<Variable> newAccessibles = new HashSet<>(); //Auxiliar
+            for (Variable variable : accessibles) {
+                newAccessibles.addAll(variable.accessibleVariables());
             }
+            accessibles.addAll(newAccessibles); // add after traverse
         } while (startCardinal < accessibles.size());
 
         Iterator<Variable> iterator = this.variables.iterator();
@@ -118,16 +125,19 @@ public class Grammar {
             }
         }
 
-        for(Variable variable : this.variables) {
-            for(Production production : variable.getProductions()) {
+        for (Variable variable : this.variables) {
+            Iterator<Production> productionIterator = variable.getProductions().iterator();
+            while (productionIterator.hasNext()) {
+                Production production = productionIterator.next();
                 HashSet<Variable> prodVariables = production.getVariablesInProduction();
-                for(Variable prodVariable : prodVariables) {
-                    if(!accessibles.contains(prodVariable)) variable.removeProduction(production);
+                for (Variable prodVariable : prodVariables) {
+                    if (!accessibles.contains(prodVariable)) {
+                        productionIterator.remove();
+                        break;
+                    }
                 }
-
             }
         }
-
     }
 
 }
