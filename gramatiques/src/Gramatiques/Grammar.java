@@ -26,8 +26,9 @@ public class Grammar {
             for(Variable variable : variables) {
                 System.out.println(variable.toString());
             }
+        } else {
+            System.out.println("Empty grammar");
         }
-        System.out.println("Empty grammar");
     }
 
     protected void eliminateNonFecunds() {
@@ -47,7 +48,7 @@ public class Grammar {
         while (iterator.hasNext()) {
             Variable variable = iterator.next();
             if (!fecunds.contains(variable)) {
-                iterator.remove(); 
+                iterator.remove();
             }
         }
 
